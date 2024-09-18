@@ -1,5 +1,6 @@
 import { useRecoilValue } from "recoil";
-import { userAtom } from "../atoms/atoms";
+import { roomListAtom, RoomType, userAtom } from "../atoms/atoms";
+import { useState } from "react";
 
 export const LeftPanel = () => {
     return (
@@ -10,7 +11,7 @@ export const LeftPanel = () => {
             <div className="w-full flex-grow px-2 py-1">
                 <RoomList />
             </div>
-            <div className="w-full h-20 px-2 pb-2 pt-1">
+            <div className="w-full h-16 px-2 pb-2 pt-1">
                 <Options />
             </div>
         </div>
@@ -45,13 +46,28 @@ const UserDetails = ({
 };
 
 const RoomList = () => {
-    return <div className="w-full h-full border border-black"></div>;
+    const roomList = useRecoilValue(roomListAtom);
+    return (
+        <div className="w-full h-full border border-black">
+            {roomList.map((room: RoomType) => (
+                <RoomListItem room={room} />
+            ))}
+        </div>
+    );
+};
+const RoomListItem = ({ room }: { room: RoomType }) => {
+    return (
+        <div className="flex flex-col px-4 py-2 border-b border-black hover:bg-gray-200 hover:cursor-pointer">
+            <div className="text-lg font-mono font-semibold">{room.roomId}</div>
+            <div className="font-mono">Room Description of {room.roomId}</div>
+        </div>
+    );
 };
 
 const Options = () => {
     return (
         <div className="w-full h-full border border-black flex flex-row">
-            <div className="flex-grow h-full flex justify-center items-center font-mono text-lg">
+            <div className="flex-grow h-full flex justify-center items-center font-mono text-md">
                 Add Room
             </div>
             <div className="w-16 h-full border-s border-black text-2xl font-mono flex justify-center items-center hover:bg-gray-200 hover:cursor-pointer">
