@@ -1,6 +1,5 @@
 import { useRecoilValue } from "recoil";
 import { roomListAtom, RoomType, userAtom } from "../atoms/atoms";
-import { useState } from "react";
 
 export const LeftPanel = () => {
     return (
@@ -50,7 +49,7 @@ const RoomList = () => {
     return (
         <div className="w-full h-full border border-black">
             {roomList.map((room: RoomType) => (
-                <RoomListItem room={room} />
+                <RoomListItem room={room} key={room.roomId} />
             ))}
         </div>
     );

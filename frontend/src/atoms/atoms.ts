@@ -8,6 +8,12 @@ export type UserType = {
 export type RoomType = {
     roomId: string;
 };
+
+export const socketAtom = atom<null | WebSocket>({
+    key: "socketAtom",
+    default: null,
+});
+
 export const defaultUsers: UserType[] = [
     {
         userId: "admin_user_1",
