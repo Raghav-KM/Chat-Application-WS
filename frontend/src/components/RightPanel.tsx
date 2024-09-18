@@ -1,5 +1,5 @@
 import { useRecoilValue } from "recoil";
-import { defaultUsers, userAtom, UserType } from "../atoms/atoms";
+import { userAtom, userListAtom, UserType } from "../atoms/atoms";
 
 export const RightPanel = () => {
     return (
@@ -19,6 +19,7 @@ export const RightPanel = () => {
 
 const MemberStatus = () => {
     const current_user = useRecoilValue(userAtom);
+    const userList = useRecoilValue(userListAtom);
     return (
         <div className="w-full h-full border border-black flex flex-row">
             <div className="w-24 border-e border-black h-full flex justify-center items-center font-mono">
@@ -27,7 +28,7 @@ const MemberStatus = () => {
                 Members
             </div>
             <div className="flex-grow h-full flex flex-row">
-                {defaultUsers
+                {userList
                     .filter((user) => user.userId != current_user.userId)
                     .map((user: UserType) => (
                         <MemberAvatar user={user} key={user.userId} />
@@ -44,7 +45,7 @@ const MemberAvatar = ({ user }: { user: UserType }) => {
                 {`${user.userName.split(" ")[0][0]}
                     ${user.userName.split(" ")[1][0]}`}
             </div>
-            {user.status == "online" ? (
+            {user.state.visibility == "online" ? (
                 <div className="text-xs w-12 flex flex-row items-center">
                     <div className="me-[2px] bg-green-500 w-2 h-2"></div>
                     <div>online</div>

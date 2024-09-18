@@ -1,10 +1,10 @@
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { defaultUsers, socketAtom, userAtom, UserType } from "../atoms/atoms";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { socketAtom, userAtom, userListAtom, UserType } from "../atoms/atoms";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 
 export const Login = () => {
     const socket = useRecoilValue(socketAtom);
+    const userList = useRecoilValue(userListAtom);
     return (
         <div className="bg-black w-full h-lvh flex justify-center items-center">
             <div className="w-[360px] bg-white h-[360px] p-4">
@@ -16,8 +16,10 @@ export const Login = () => {
                             Select USER
                         </div>
                         <div className="flex-grow justify-center  w-full flex flex-col gap-2">
-                            {defaultUsers
-                                .filter((user) => user.status == "offline")
+                            {userList
+                                .filter(
+                                    (user) => user.state.visibility == "offline"
+                                )
                                 .map((user: UserType) => (
                                     <UserSelectButton
                                         user={user}
@@ -35,8 +37,21 @@ export const Login = () => {
 export const UserSelectButton = ({ user }: { user: UserType }) => {
     const setUser = useSetRecoilState(userAtom);
     const navigate = useNavigate();
+    const socket = useRecoilValue(socketAtom);
+
     const handleOnClick = () => {
         setUser(user);
+        const message = {
+            type: "init",
+            init_body: {
+                userId: user.userId,
+                userName: user.userName,
+                state: {
+                    visibility: "online",
+                },
+            },
+        };
+        socket?.send(JSON.stringify(message));
         navigate("/dashboard");
     };
     return (
