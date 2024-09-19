@@ -1,7 +1,6 @@
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { socketAtom, userAtom, userListAtom, UserType } from "../atoms/atoms";
 import { useNavigate } from "react-router-dom";
-import { ClientMessageType } from "../../../backend/src/types";
 
 export const Login = () => {
     const socket = useRecoilValue(socketAtom);
@@ -40,7 +39,6 @@ export const Login = () => {
 export const UserSelectButton = ({ user }: { user: UserType }) => {
     const setUser = useSetRecoilState(userAtom);
     const navigate = useNavigate();
-    const socket = useRecoilValue(socketAtom);
 
     const handleOnClick = () => {
         setUser({
@@ -49,18 +47,6 @@ export const UserSelectButton = ({ user }: { user: UserType }) => {
                 visibility: "online",
             },
         });
-
-        const message: ClientMessageType = {
-            type: "init",
-            init_body: {
-                userId: user.userId,
-                userName: user.userName,
-                state: {
-                    visibility: "online",
-                },
-            },
-        };
-        socket?.send(JSON.stringify(message));
         sessionStorage.setItem("active-user", JSON.stringify(user));
         navigate("/dashboard");
     };

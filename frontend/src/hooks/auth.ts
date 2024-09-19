@@ -12,6 +12,7 @@ export const useAuth = () => {
 
     useEffect(() => {
         if (sessionStorage.getItem("active-user")) {
+            console.log("Authenticating User..");
             try {
                 const user: UserType = JSON.parse(
                     sessionStorage.getItem("active-user")!

@@ -42,6 +42,7 @@ const UserInfo = () => {
                 visibility: "offline",
             },
         });
+        
         sessionStorage.removeItem("active-user");
         navigate("/login");
     };
