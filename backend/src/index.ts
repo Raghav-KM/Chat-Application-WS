@@ -28,6 +28,7 @@ type ServerMessageType = {
 const connections: {
     [key: string]: {
         userId: string;
+        ws: WebSocket;
     };
 } = {};
 
@@ -79,6 +80,7 @@ wss.on("connection", (ws: WebSocket) => {
 const init_connection = (uuid: string, ws: WebSocket) => {
     connections[uuid] = {
         userId: "",
+        ws: ws,
     };
     const message: ServerMessageType = {
         type: "state",
@@ -90,14 +92,34 @@ const init_connection = (uuid: string, ws: WebSocket) => {
 };
 
 const delete_user = (uuid: string) => {
+    if (connections[uuid].userId != "") {
+        user_details[connections[uuid].userId].state.visibility = "offline";
+        broadcast_user_details();
+    }
     delete connections[uuid];
 };
 
 const handle_message = (uuid: string, message: any) => {
-    console.log(message);
     if (message.type == "init") {
         connections[uuid].userId = message.init_body.userId;
-        console.log(connections[uuid]);
         user_details[connections[uuid].userId] = message.init_body;
+        broadcast_user_details();
     }
+};
+
+const broadcast_user_details = (uuid?: string) => {
+    Object.keys(connections).forEach((key) => {
+        if (key != uuid) {
+            const ws = connections[key].ws;
+            const message: ServerMessageType = {
+                type: "state",
+                state_body: {
+                    users: Object.keys(user_details).map(
+                        (key) => user_details[key]
+                    ),
+                },
+            };
+            ws.send(JSON.stringify(message));
+        }
+    });
 };
