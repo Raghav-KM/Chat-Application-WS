@@ -21,7 +21,7 @@ const MemberStatus = () => {
     const current_user = useRecoilValue(userAtom);
     const userList = useRecoilValue(userListAtom);
     return (
-        <div className="w-full h-full border border-black flex flex-row">
+        <div className="w-full h-full border border-black flex flex-row gap-2">
             <div className="w-24 border-e border-black h-full flex justify-center items-center font-mono">
                 Other
                 <br></br>

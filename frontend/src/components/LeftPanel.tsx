@@ -1,5 +1,6 @@
-import { useRecoilValue } from "recoil";
-import { roomListAtom, RoomType, userAtom } from "../atoms/atoms";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { roomListAtom, RoomType, socketAtom, userAtom } from "../atoms/atoms";
+import { useNavigate } from "react-router-dom";
 
 export const LeftPanel = () => {
     return (
@@ -18,11 +19,43 @@ export const LeftPanel = () => {
 };
 
 const UserInfo = () => {
-    const user = useRecoilValue(userAtom);
+    const [user, setUser] = useRecoilState(userAtom);
+    const socket = useRecoilValue(socketAtom);
+    const navigate = useNavigate();
+    const handleOnLogout = () => {
+        const message = {
+            type: "init",
+            init_body: {
+                userId: user.userId,
+                userName: user.userName,
+                state: {
+                    visibility: "offline",
+                },
+            },
+        };
+        socket?.send(JSON.stringify(message));
+        setUser({
+            userId: "",
+            userName: "",
+            state: {
+                visibility: "offline",
+            },
+        });
+        sessionStorage.removeItem("active-user");
+        navigate("/login");
+    };
     return (
-        <div className="w-full h-full border border-black p-2 flex flex-col justify-center">
-            <UserDetails heading="Id:" value={user.userId} />
-            <UserDetails heading="Name:" value={user.userName} />
+        <div className="flex flex-row border border-black w-full h-full">
+            <div className="flex-grow h-full p-2 flex flex-col justify-center">
+                <UserDetails heading="Id:" value={user.userId} />
+                <UserDetails heading="Name:" value={user.userName} />
+            </div>
+            <div
+                className="w-20 h-full border-s border-black p-2 flex justify-center items-center font-mono text-sm font-bold hover:bg-gray-200 cursor-pointer"
+                onClick={handleOnLogout}
+            >
+                Logout
+            </div>
         </div>
     );
 };
@@ -35,7 +68,7 @@ const UserDetails = ({
     value: string;
 }) => {
     return (
-        <div className="flex flex-row p-1 gap-2 items-center">
+        <div className="w-full flex flex-row p-1 gap-2 items-center">
             <div className="w-16 font-mono text-end font-bold text-md">
                 {heading}
             </div>

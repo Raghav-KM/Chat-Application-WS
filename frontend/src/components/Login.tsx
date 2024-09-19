@@ -40,7 +40,13 @@ export const UserSelectButton = ({ user }: { user: UserType }) => {
     const socket = useRecoilValue(socketAtom);
 
     const handleOnClick = () => {
-        setUser(user);
+        setUser({
+            ...user,
+            state: {
+                visibility: "online",
+            },
+        });
+
         const message = {
             type: "init",
             init_body: {
@@ -52,6 +58,8 @@ export const UserSelectButton = ({ user }: { user: UserType }) => {
             },
         };
         socket?.send(JSON.stringify(message));
+        sessionStorage.setItem("active-user", JSON.stringify(user));
+
         navigate("/dashboard");
     };
     return (
