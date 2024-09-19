@@ -94,10 +94,7 @@ const delete_connection = (uuid: string) => {
 const handle_message = (uuid: string, message: ClientMessageType) => {
     if (message.type == "init" && message.init_body) {
         connections[uuid].userId = message.init_body.userId;
-        user_details[connections[uuid].userId] = {
-            ...message.init_body,
-            state: { visibility: "online" },
-        };
+        user_details[connections[uuid].userId] = message.init_body;
         broadcast_user_details();
     }
 };
