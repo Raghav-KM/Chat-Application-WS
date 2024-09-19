@@ -1,6 +1,7 @@
 import { useRecoilState, useRecoilValue } from "recoil";
 import { roomListAtom, RoomType, socketAtom, userAtom } from "../atoms/atoms";
 import { useNavigate } from "react-router-dom";
+import { ClientMessageType } from "../../../backend/src/types";
 
 export const LeftPanel = () => {
     return (
@@ -23,7 +24,7 @@ const UserInfo = () => {
     const socket = useRecoilValue(socketAtom);
     const navigate = useNavigate();
     const handleOnLogout = () => {
-        const message = {
+        const message: ClientMessageType = {
             type: "init",
             init_body: {
                 userId: user.userId,

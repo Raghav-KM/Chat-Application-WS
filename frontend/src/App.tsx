@@ -7,6 +7,7 @@ import { socketAtom, userListAtom } from "./atoms/atoms";
 import { useEffect } from "react";
 import { GuestRoutes } from "./components/route-types/GuestRoutes";
 import { ProtectedRoutes } from "./components/route-types/ProtextedRoutes";
+import { ServerMessageType } from "../../backend/src/types";
 
 function App() {
     const [socket, setSocket] = useRecoilState(socketAtom);
@@ -20,11 +21,19 @@ function App() {
         };
 
         socket.onmessage = (message) => {
-            // console.log(`Received Message : ${message.data}`);
-            const parsed_message = JSON.parse(message.data);
-            console.log(parsed_message);
-            if (parsed_message.type == "state") {
-                setUserList(parsed_message.state_body.users);
+            try {
+                const parsed_message = JSON.parse(
+                    message.data
+                ) as ServerMessageType;
+                console.log(parsed_message);
+
+                if (parsed_message.type == "state") {
+                    setUserList(parsed_message.state_body.users);
+                } else if (parsed_message.type == "message") {
+                }
+                
+            } catch (ex) {
+                console.log("Invalid Server Message");
             }
         };
 

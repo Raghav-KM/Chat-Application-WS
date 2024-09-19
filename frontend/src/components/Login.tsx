@@ -1,6 +1,7 @@
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { socketAtom, userAtom, userListAtom, UserType } from "../atoms/atoms";
 import { useNavigate } from "react-router-dom";
+import { ClientMessageType } from "../../../backend/src/types";
 
 export const Login = () => {
     const socket = useRecoilValue(socketAtom);
@@ -9,7 +10,9 @@ export const Login = () => {
         <div className="bg-black w-full h-lvh flex justify-center items-center">
             <div className="w-[360px] bg-white h-[360px] p-4">
                 {!socket ? (
-                    <div>Loading....</div>
+                    <div className="font-mono text-sm font-semibold">
+                        Establishing WS Connection....
+                    </div>
                 ) : (
                     <div className="w-full h-full border border-black p-8 flex flex-col ">
                         <div className="h-fit w-full p-2 text-center font-mono font-bold text-2xl">
@@ -47,7 +50,7 @@ export const UserSelectButton = ({ user }: { user: UserType }) => {
             },
         });
 
-        const message = {
+        const message: ClientMessageType = {
             type: "init",
             init_body: {
                 userId: user.userId,
@@ -59,7 +62,6 @@ export const UserSelectButton = ({ user }: { user: UserType }) => {
         };
         socket?.send(JSON.stringify(message));
         sessionStorage.setItem("active-user", JSON.stringify(user));
-
         navigate("/dashboard");
     };
     return (
