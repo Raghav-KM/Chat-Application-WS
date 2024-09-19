@@ -1,29 +1,13 @@
 import express from "express";
 import { WebSocket } from "ws";
 import { v4 as uuidv4 } from "uuid";
+import { ClientMessageType, ServerMessageType } from "./types";
 
 const app = express();
 const httpServer = app.listen(3000, () => {
     console.log("Listening to Port : 3000");
 });
 const wss = new WebSocket.Server({ server: httpServer });
-
-type ClientMessageType = {
-    type: "init" | "message";
-    init_body?: {
-        userId: string;
-        userName: string;
-    };
-    message_body: {
-        data: any;
-    };
-};
-
-type ServerMessageType = {
-    type: "state" | "message";
-    state_body?: any;
-    message_body?: any;
-};
 
 const connections: {
     [key: string]: {
@@ -68,12 +52,18 @@ wss.on("connection", (ws: WebSocket) => {
     const uuid = uuidv4();
     init_connection(uuid, ws);
 
-    ws.on("message", (message: any) =>
-        handle_message(uuid, JSON.parse(message))
-    );
+    ws.on("message", (message: any) => {
+        try {
+            const parsed_message = JSON.parse(message) as ClientMessageType;
+            handle_message(uuid, parsed_message);
+        } catch (ex) {
+            console.log("Invalid Message Type");
+        }
+    });
+
     ws.on("close", () => {
         console.log(`Connection Closed : ${uuid}`);
-        delete_user(uuid);
+        delete_connection(uuid);
     });
 });
 
@@ -82,16 +72,18 @@ const init_connection = (uuid: string, ws: WebSocket) => {
         userId: "",
         ws: ws,
     };
+
     const message: ServerMessageType = {
         type: "state",
         state_body: {
             users: Object.keys(user_details).map((key) => user_details[key]),
         },
     };
+
     ws.send(JSON.stringify(message));
 };
 
-const delete_user = (uuid: string) => {
+const delete_connection = (uuid: string) => {
     if (connections[uuid].userId != "") {
         user_details[connections[uuid].userId].state.visibility = "offline";
         broadcast_user_details();
@@ -99,10 +91,13 @@ const delete_user = (uuid: string) => {
     delete connections[uuid];
 };
 
-const handle_message = (uuid: string, message: any) => {
-    if (message.type == "init") {
+const handle_message = (uuid: string, message: ClientMessageType) => {
+    if (message.type == "init" && message.init_body) {
         connections[uuid].userId = message.init_body.userId;
-        user_details[connections[uuid].userId] = message.init_body;
+        user_details[connections[uuid].userId] = {
+            ...message.init_body,
+            state: { visibility: "online" },
+        };
         broadcast_user_details();
     }
 };
