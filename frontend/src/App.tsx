@@ -31,7 +31,6 @@ function App() {
                     setUserList(parsed_message.state_body.users);
                 } else if (parsed_message.type == "message") {
                 }
-                
             } catch (ex) {
                 console.log("Invalid Server Message");
             }
@@ -39,6 +38,7 @@ function App() {
 
         socket.onclose = () => {
             console.log("Disconnected from server");
+            setSocket(null);
         };
     }, []);
 
@@ -51,6 +51,7 @@ function App() {
                 <Route element={<ProtectedRoutes />}>
                     <Route path="/dashboard" element={<Dashboard />} />
                 </Route>
+                <Route path="*" element={<Login />} />
             </Routes>
         </>
     );
