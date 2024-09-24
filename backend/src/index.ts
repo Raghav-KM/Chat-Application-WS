@@ -1,7 +1,7 @@
 import express from "express";
 import { WebSocket } from "ws";
 import { v4 as uuidv4 } from "uuid";
-import { ClientMessageType, ServerMessageType } from "./types";
+import { ClientMessageType, RoomType, ServerMessageType } from "./types";
 
 const app = express();
 const httpServer = app.listen(3000, () => {
@@ -15,6 +15,15 @@ const connections: {
         ws: WebSocket;
     };
 } = {};
+
+const room_details: {
+    [key: string]: RoomType;
+} = {
+    admin_room_1: {
+        room_id: "admin_room_1",
+        member_ids: ["admin_user_1", "admin_user_2", "admin_user_3"],
+    },
+};
 
 const user_details: {
     [key: string]: {
@@ -73,14 +82,23 @@ const init_connection = (uuid: string, ws: WebSocket) => {
         ws: ws,
     };
 
-    const message: ServerMessageType = {
+    const user_details_message: ServerMessageType = {
         type: "state",
         state_body: {
             users: Object.keys(user_details).map((key) => user_details[key]),
         },
     };
 
-    ws.send(JSON.stringify(message));
+    ws.send(JSON.stringify(user_details_message));
+
+    const room_details_message: ServerMessageType = {
+        type: "room_state",
+        state_body: {
+            rooms: Object.keys(room_details).map((key) => room_details[key]),
+        },
+    };
+
+    ws.send(JSON.stringify(room_details_message));
 };
 
 const delete_connection = (uuid: string) => {
@@ -96,6 +114,8 @@ const handle_message = (uuid: string, message: ClientMessageType) => {
         connections[uuid].userId = message.init_body.userId;
         user_details[connections[uuid].userId] = message.init_body;
         broadcast_user_details();
+    } else if (message.type == "message" && message.init_body) {
+        broadcast_message(message);
     }
 };
 
@@ -112,6 +132,24 @@ const broadcast_user_details = (uuid?: string) => {
                 },
             };
             ws.send(JSON.stringify(message));
+        }
+    });
+};
+
+const broadcast_message = (message: ClientMessageType) => {
+    if (!message.message_body) return;
+    const room_id = message.message_body.room_id;
+    Object.keys(connections).forEach((key) => {
+        if (
+            key != message.message_body?.sender_id &&
+            room_details[room_id].member_ids.includes(connections[key].userId)
+        ) {
+            const ws = connections[key].ws;
+            const server_message: ServerMessageType = {
+                type: "message",
+                message_body: message.message_body,
+            };
+            ws.send(JSON.stringify(server_message));
         }
     });
 };
