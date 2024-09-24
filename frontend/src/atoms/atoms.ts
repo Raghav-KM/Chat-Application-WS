@@ -1,5 +1,9 @@
 import { atom } from "recoil";
-import { RoomType, UserType } from "../../../backend/src/types";
+import {
+    ChatMessageType,
+    RoomType,
+    UserType,
+} from "../../../backend/src/types";
 
 export const socketAtom = atom<null | WebSocket>({
     key: "socketAtom",
@@ -25,4 +29,31 @@ export const userListAtom = atom<UserType[]>({
 export const roomListAtom = atom<RoomType[]>({
     key: "roolListAtom",
     default: [],
+});
+
+export const messageListAtom = atom<{
+    [key: string]: { messages: ChatMessageType[] };
+}>({
+    key: "messageListAtom",
+    default: {
+        admin_room_1: {
+            messages: [
+                {
+                    message_body: "Some Random Message",
+                    room_id: "admin_room_1",
+                    sender_id: "admin_user_1",
+                },
+                {
+                    message_body: "Some Random Message",
+                    room_id: "admin_room_1",
+                    sender_id: "admin_user_2",
+                },
+                {
+                    message_body: "Some Random Message",
+                    room_id: "admin_room_1",
+                    sender_id: "admin_user_3",
+                },
+            ],
+        },
+    },
 });

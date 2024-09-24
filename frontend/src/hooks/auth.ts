@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { socketAtom, userAtom, UserType } from "../atoms/atoms";
-import { ClientMessageType } from "../../../backend/src/types";
+import { socketAtom, userAtom } from "../atoms/atoms";
+import { ClientMessageType, UserType } from "../../../backend/src/types";
 
 export const useAuth = () => {
     const [loading, setLoading] = useState(true);
