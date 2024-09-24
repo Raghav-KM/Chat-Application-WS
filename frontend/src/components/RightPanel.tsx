@@ -1,6 +1,7 @@
 import { useRecoilValue } from "recoil";
 import { userAtom, userListAtom } from "../atoms/atoms";
 import { UserType } from "../../../backend/src/types";
+import { MessageSection } from "./CharSection";
 
 export const RightPanel = () => {
     return (
@@ -8,10 +9,7 @@ export const RightPanel = () => {
             <div className="w-full h-24 px-2 pt-2 pb-1">
                 <MemberStatus />
             </div>
-            <div className="w-full flex-grow px-2 py-1">
-                <ChatSection />
-            </div>
-            <div className="w-full h-16 px-2 pb-2 pt-1">
+            <div className="w-full flex-grow">
                 <MessageSection />
             </div>
         </div>
@@ -62,19 +60,4 @@ const MemberAvatar = ({ user }: { user: UserType }) => {
     );
 };
 
-const ChatSection = () => {
-    return <div className="w-full h-full border border-black"></div>;
-};
 
-const MessageSection = () => {
-    return (
-        <div className="w-full h-full border border-black flex flex-row">
-            <div className="flex-grow h-full p-2">
-                <input className="w-full h-full border outline-none p-4 text-sm font-mono bg-gray-50"></input>
-            </div>
-            <div className="w-16 h-full hover:bg-gray-200 hover:font-semibold cursor-pointer flex justify-center items-center font-mono border-s border-black text-sm">
-                Send
-            </div>
-        </div>
-    );
-};

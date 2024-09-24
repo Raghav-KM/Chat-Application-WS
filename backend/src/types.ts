@@ -38,3 +38,9 @@ export type UserType = {
         visibility: "online" | "offline";
     };
 };
+
+export type ChatMessageType = {
+    room_id: string;
+    sender_id: string;
+    message_body: string;
+};
