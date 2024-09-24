@@ -1,6 +1,7 @@
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { socketAtom, userAtom, userListAtom, UserType } from "../atoms/atoms";
+import { socketAtom, userAtom, userListAtom } from "../atoms/atoms";
 import { useNavigate } from "react-router-dom";
+import { UserType } from "../../../backend/src/types";
 
 export const Login = () => {
     const socket = useRecoilValue(socketAtom);
@@ -25,7 +26,7 @@ export const Login = () => {
                                 .map((user: UserType) => (
                                     <UserSelectButton
                                         user={user}
-                                        key={user.userId}
+                                        key={user.user_id}
                                     ></UserSelectButton>
                                 ))}
                         </div>

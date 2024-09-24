@@ -20,7 +20,7 @@ export const useAuth = () => {
                 const message: ClientMessageType = {
                     type: "init",
                     init_body: {
-                        userId: user.userId,
+                        user_id: user.user_id,
                         userName: user.userName,
                         state: {
                             visibility: "online",

@@ -11,7 +11,7 @@ const wss = new WebSocket.Server({ server: httpServer });
 
 const connections: {
     [key: string]: {
-        userId: string;
+        user_id: string;
         ws: WebSocket;
     };
 } = {};
@@ -27,7 +27,7 @@ const room_details: {
 
 const user_details: {
     [key: string]: {
-        userId: string;
+        user_id: string;
         userName: string;
         state: {
             visibility: "online" | "offline";
@@ -35,21 +35,21 @@ const user_details: {
     };
 } = {
     admin_user_1: {
-        userId: "admin_user_1",
+        user_id: "admin_user_1",
         userName: "User A",
         state: {
             visibility: "offline",
         },
     },
     admin_user_2: {
-        userId: "admin_user_2",
+        user_id: "admin_user_2",
         userName: "User B",
         state: {
             visibility: "offline",
         },
     },
     admin_user_3: {
-        userId: "admin_user_3",
+        user_id: "admin_user_3",
         userName: "User C",
         state: {
             visibility: "offline",
@@ -78,7 +78,7 @@ wss.on("connection", (ws: WebSocket) => {
 
 const init_connection = (uuid: string, ws: WebSocket) => {
     connections[uuid] = {
-        userId: "",
+        user_id: "",
         ws: ws,
     };
 
@@ -102,8 +102,8 @@ const init_connection = (uuid: string, ws: WebSocket) => {
 };
 
 const delete_connection = (uuid: string) => {
-    if (connections[uuid].userId != "") {
-        user_details[connections[uuid].userId].state.visibility = "offline";
+    if (connections[uuid].user_id != "") {
+        user_details[connections[uuid].user_id].state.visibility = "offline";
         broadcast_user_details();
     }
     delete connections[uuid];
@@ -111,8 +111,8 @@ const delete_connection = (uuid: string) => {
 
 const handle_message = (uuid: string, message: ClientMessageType) => {
     if (message.type == "init" && message.init_body) {
-        connections[uuid].userId = message.init_body.userId;
-        user_details[connections[uuid].userId] = message.init_body;
+        connections[uuid].user_id = message.init_body.user_id;
+        user_details[connections[uuid].user_id] = message.init_body;
         broadcast_user_details();
     } else if (message.type == "message" && message.init_body) {
         broadcast_message(message);
@@ -142,7 +142,7 @@ const broadcast_message = (message: ClientMessageType) => {
     Object.keys(connections).forEach((key) => {
         if (
             key != message.message_body?.sender_id &&
-            room_details[room_id].member_ids.includes(connections[key].userId)
+            room_details[room_id].member_ids.includes(connections[key].user_id)
         ) {
             const ws = connections[key].ws;
             const server_message: ServerMessageType = {

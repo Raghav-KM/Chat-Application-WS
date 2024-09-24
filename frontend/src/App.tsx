@@ -1,9 +1,9 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import { Login } from "./components/Login";
 import { Dashboard } from "./components/Dashboard";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { socketAtom, userListAtom } from "./atoms/atoms";
+import { roomListAtom, socketAtom, userListAtom } from "./atoms/atoms";
 import { useEffect } from "react";
 import { GuestRoutes } from "./components/route-types/GuestRoutes";
 import { ProtectedRoutes } from "./components/route-types/ProtextedRoutes";
@@ -12,6 +12,7 @@ import { ServerMessageType } from "../../backend/src/types";
 function App() {
     const [socket, setSocket] = useRecoilState(socketAtom);
     const setUserList = useSetRecoilState(userListAtom);
+    const setRoomList = useSetRecoilState(roomListAtom);
 
     useEffect(() => {
         const socket = new WebSocket("ws://localhost:3000");
@@ -27,8 +28,16 @@ function App() {
                 ) as ServerMessageType;
                 console.log(parsed_message);
 
-                if (parsed_message.type == "state") {
+                if (
+                    parsed_message.type == "state" &&
+                    parsed_message.state_body
+                ) {
                     setUserList(parsed_message.state_body.users);
+                } else if (
+                    parsed_message.type == "room_state" &&
+                    parsed_message.state_body
+                ) {
+                    setRoomList(parsed_message.state_body.rooms);
                 } else if (parsed_message.type == "message") {
                 }
             } catch (ex) {

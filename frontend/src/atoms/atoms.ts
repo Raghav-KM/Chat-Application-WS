@@ -1,15 +1,5 @@
 import { atom } from "recoil";
-
-export type UserType = {
-    userId: string;
-    userName: string;
-    state: {
-        visibility: "online" | "offline";
-    };
-};
-export type RoomType = {
-    roomId: string;
-};
+import { RoomType, UserType } from "../../../backend/src/types";
 
 export const socketAtom = atom<null | WebSocket>({
     key: "socketAtom",
@@ -19,7 +9,7 @@ export const socketAtom = atom<null | WebSocket>({
 export const userAtom = atom<UserType>({
     key: "userAtom",
     default: {
-        userId: "",
+        user_id: "",
         userName: "",
         state: {
             visibility: "offline",
@@ -34,12 +24,5 @@ export const userListAtom = atom<UserType[]>({
 
 export const roomListAtom = atom<RoomType[]>({
     key: "roolListAtom",
-    default: [
-        {
-            roomId: "room_id_1",
-        },
-        {
-            roomId: "room_id_2",
-        },
-    ],
+    default: [],
 });

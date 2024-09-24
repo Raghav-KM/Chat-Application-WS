@@ -1,7 +1,7 @@
 export type ClientMessageType = {
     type: "init" | "message";
     init_body?: {
-        userId: string;
+        user_id: string;
         userName: string;
         state: {
             visibility: "offline" | "online";
@@ -16,7 +16,10 @@ export type ClientMessageType = {
 
 export type ServerMessageType = {
     type: "state" | "message" | "room_state";
-    state_body?: any;
+    state_body?: {
+        users?: any;
+        rooms?: any;
+    };
     message_body?: {
         sender_id: string;
         room_id: string;
@@ -27,4 +30,11 @@ export type ServerMessageType = {
 export type RoomType = {
     room_id: string;
     member_ids: string[];
+};
+export type UserType = {
+    user_id: string;
+    userName: string;
+    state: {
+        visibility: "online" | "offline";
+    };
 };

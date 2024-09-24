@@ -1,7 +1,7 @@
 import { useRecoilState, useRecoilValue } from "recoil";
-import { roomListAtom, RoomType, socketAtom, userAtom } from "../atoms/atoms";
+import { roomListAtom, socketAtom, userAtom } from "../atoms/atoms";
 import { useNavigate } from "react-router-dom";
-import { ClientMessageType } from "../../../backend/src/types";
+import { ClientMessageType, RoomType } from "../../../backend/src/types";
 
 export const LeftPanel = () => {
     return (
@@ -27,7 +27,7 @@ const UserInfo = () => {
         const message: ClientMessageType = {
             type: "init",
             init_body: {
-                userId: user.userId,
+                user_id: user.user_id,
                 userName: user.userName,
                 state: {
                     visibility: "offline",
@@ -36,20 +36,20 @@ const UserInfo = () => {
         };
         socket?.send(JSON.stringify(message));
         setUser({
-            userId: "",
+            user_id: "",
             userName: "",
             state: {
                 visibility: "offline",
             },
         });
-        
+
         sessionStorage.removeItem("active-user");
         navigate("/login");
     };
     return (
         <div className="flex flex-row border border-black w-full h-full">
             <div className="flex-grow h-full p-2 flex flex-col justify-center">
-                <UserDetails heading="Id:" value={user.userId} />
+                <UserDetails heading="Id:" value={user.user_id} />
                 <UserDetails heading="Name:" value={user.userName} />
             </div>
             <div
@@ -80,20 +80,27 @@ const UserDetails = ({
 };
 
 const RoomList = () => {
+    const user = useRecoilValue(userAtom);
     const roomList = useRecoilValue(roomListAtom);
     return (
         <div className="w-full h-full border border-black">
-            {roomList.map((room: RoomType) => (
-                <RoomListItem room={room} key={room.roomId} />
-            ))}
+            {roomList
+                .filter((room: RoomType) =>
+                    room.member_ids.includes(user.user_id)
+                )
+                .map((room: RoomType) => (
+                    <RoomListItem room={room} key={room.room_id} />
+                ))}
         </div>
     );
 };
 const RoomListItem = ({ room }: { room: RoomType }) => {
     return (
         <div className="flex flex-col px-4 py-2 border-b border-black hover:bg-gray-200 hover:cursor-pointer">
-            <div className="text-lg font-mono font-semibold">{room.roomId}</div>
-            <div className="font-mono">Room Description of {room.roomId}</div>
+            <div className="text-lg font-mono font-semibold">
+                {room.room_id}
+            </div>
+            <div className="font-mono">Room Description of {room.room_id}</div>
         </div>
     );
 };
