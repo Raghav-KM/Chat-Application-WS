@@ -7,11 +7,7 @@ export type ClientMessageType = {
             visibility: "offline" | "online";
         };
     };
-    message_body?: {
-        sender_id: string;
-        room_id: string;
-        data: string;
-    };
+    message_body?: ChatMessageType;
 };
 
 export type ServerMessageType = {
@@ -20,11 +16,7 @@ export type ServerMessageType = {
         users?: any;
         rooms?: any;
     };
-    message_body?: {
-        sender_id: string;
-        room_id: string;
-        data: string;
-    };
+    message_body?: ChatMessageType;
 };
 
 export type RoomType = {
@@ -40,7 +32,8 @@ export type UserType = {
 };
 
 export type ChatMessageType = {
+    message_id: string;
     room_id: string;
     sender_id: string;
-    message_body: string;
+    body: string;
 };

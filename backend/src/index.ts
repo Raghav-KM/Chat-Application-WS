@@ -114,7 +114,7 @@ const handle_message = (uuid: string, message: ClientMessageType) => {
         connections[uuid].user_id = message.init_body.user_id;
         user_details[connections[uuid].user_id] = message.init_body;
         broadcast_user_details();
-    } else if (message.type == "message" && message.init_body) {
+    } else if (message.type == "message" && message.message_body) {
         broadcast_message(message);
     }
 };
@@ -141,7 +141,6 @@ const broadcast_message = (message: ClientMessageType) => {
     const room_id = message.message_body.room_id;
     Object.keys(connections).forEach((key) => {
         if (
-            key != message.message_body?.sender_id &&
             room_details[room_id].member_ids.includes(connections[key].user_id)
         ) {
             const ws = connections[key].ws;
@@ -149,7 +148,8 @@ const broadcast_message = (message: ClientMessageType) => {
                 type: "message",
                 message_body: message.message_body,
             };
-            ws.send(JSON.stringify(server_message));
+            if (connections[key].user_id != message.message_body?.sender_id)
+                ws.send(JSON.stringify(server_message));
         }
     });
 };

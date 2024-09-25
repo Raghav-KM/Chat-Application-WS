@@ -1,7 +1,13 @@
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { ChatMessageType } from "../../../backend/src/types";
-import { messageListAtom, userAtom } from "../atoms/atoms";
+import { ChatMessageType, ClientMessageType } from "../../../backend/src/types";
+import {
+    messageListAtom,
+    socketAtom,
+    userAtom,
+    userMapSelector,
+} from "../atoms/atoms";
 import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 export const MessageSection = () => {
     return (
@@ -17,28 +23,43 @@ export const MessageSection = () => {
 };
 
 const MessageInput = () => {
+    const socket = useRecoilValue(socketAtom);
     const [input, setInput] = useState("");
 
     const user = useRecoilValue(userAtom);
     const setMessage = useSetRecoilState(messageListAtom);
 
     const handleSendMessage = () => {
+        if (input == "") return;
+
+        let new_message: ChatMessageType = {
+            message_id: uuidv4(),
+            body: input,
+            sender_id: user.user_id,
+            room_id: "admin_room_1",
+        };
+
         setMessage((message) => {
             let updated_message = message;
+
             updated_message = {
                 admin_room_1: {
                     messages: [
                         ...message["admin_room_1"].messages,
-                        {
-                            message_body: input,
-                            sender_id: user.user_id,
-                            room_id: "admin_room_1",
-                        },
+                        new_message,
                     ],
                 },
             };
+            // console.log(updated_message);
             return updated_message;
         });
+
+        const client_message: ClientMessageType = {
+            type: "message",
+            message_body: new_message,
+        };
+
+        socket?.send(JSON.stringify(client_message));
         setInput("");
     };
 
@@ -71,7 +92,11 @@ const MessageWindow = () => {
     return (
         <div className="w-full min-h-[550px] max-h-[550px] overflow-auto border border-black flex flex-col gap-3 py-2 px-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
             {messages.map((m) => (
-                <Message message={m} isSender={m.sender_id == user.user_id} />
+                <Message
+                    message={m}
+                    isSender={m.sender_id == user.user_id}
+                    key={m.message_id}
+                />
             ))}
         </div>
     );
@@ -84,6 +109,11 @@ const Message = ({
     message: ChatMessageType;
     isSender: boolean;
 }) => {
+    const userMap = useRecoilValue(userMapSelector);
+    const userName = userMap[message.sender_id]?.userName;
+    const userNameShort = `${userName?.split(" ")[0][0]} ${
+        userName?.split(" ")[1][0]
+    }`;
     return (
         <div
             className={`w-full flex ${
@@ -93,14 +123,14 @@ const Message = ({
             }  p-2 gap-1 bg-gray-100 shadow-sm`}
         >
             <div className="w-10 min-w-10 h-10 border bg-gray-50 flex justify-center items-center text-xs font-semibold">
-                {"U A"}
+                {userNameShort}
             </div>
             <div
                 className={`flex-grow px-2 h-full text-sm whitespace-pre-wrap font-mono ${
                     isSender ? "flex justify-end" : "flex justify-start"
                 }`}
             >
-                {message.message_body}
+                {message.body}
             </div>
         </div>
     );

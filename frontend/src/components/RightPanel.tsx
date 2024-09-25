@@ -1,7 +1,7 @@
 import { useRecoilValue } from "recoil";
 import { userAtom, userListAtom } from "../atoms/atoms";
 import { UserType } from "../../../backend/src/types";
-import { MessageSection } from "./CharSection";
+import { MessageSection } from "./ChatSection";
 
 export const RightPanel = () => {
     return (

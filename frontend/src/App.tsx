@@ -1,18 +1,24 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { Login } from "./components/Login";
 import { Dashboard } from "./components/Dashboard";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { roomListAtom, socketAtom, userListAtom } from "./atoms/atoms";
+import {
+    messageListAtom,
+    roomListAtom,
+    socketAtom,
+    userListAtom,
+} from "./atoms/atoms";
 import { useEffect } from "react";
 import { GuestRoutes } from "./components/route-types/GuestRoutes";
 import { ProtectedRoutes } from "./components/route-types/ProtextedRoutes";
-import { ServerMessageType } from "../../backend/src/types";
+import { ChatMessageType, ServerMessageType } from "../../backend/src/types";
 
 function App() {
     const [socket, setSocket] = useRecoilState(socketAtom);
     const setUserList = useSetRecoilState(userListAtom);
     const setRoomList = useSetRecoilState(roomListAtom);
+    const setMessages = useSetRecoilState(messageListAtom);
 
     useEffect(() => {
         const socket = new WebSocket("ws://localhost:3000");
@@ -39,6 +45,25 @@ function App() {
                 ) {
                     setRoomList(parsed_message.state_body.rooms);
                 } else if (parsed_message.type == "message") {
+                    if (!parsed_message.message_body) return;
+
+                    const received_message: ChatMessageType =
+                        parsed_message.message_body;
+
+                    setMessages((message) => {
+                        let updated_message = message;
+
+                        updated_message = {
+                            admin_room_1: {
+                                messages: [
+                                    ...message["admin_room_1"].messages,
+                                    received_message,
+                                ],
+                            },
+                        };
+                        // console.log(updated_message);
+                        return updated_message;
+                    });
                 }
             } catch (ex) {
                 console.log("Invalid Server Message");
@@ -60,7 +85,7 @@ function App() {
                 <Route element={<ProtectedRoutes />}>
                     <Route path="/dashboard" element={<Dashboard />} />
                 </Route>
-                <Route path="*" element={<Login />} />
+                <Route path="*" element={<Navigate to={"/login"} />} />
             </Routes>
         </>
     );
