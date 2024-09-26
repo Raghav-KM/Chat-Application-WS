@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { Login } from "./components/Login";
 import { Dashboard } from "./components/Dashboard";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import {
     messageListAtom,
     roomListAtom,
