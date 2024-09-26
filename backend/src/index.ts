@@ -133,11 +133,10 @@ const handle_message = (uuid: string, message: ClientMessageType) => {
 
         if (visibility == "offline") {
             console.log(`User (${connections[uuid].user_id}) Logged Out!`);
+            connections[uuid].user_id = "";
         } else if (visibility == "online") {
             console.log(`User (${connections[uuid].user_id}) Logged In!`);
         }
-
-        connections[uuid].user_id = "";
 
         broadcast_user_details();
     } else if (message.type == "message" && message.message_body) {
