@@ -4,7 +4,6 @@ import {
     RoomType,
     UserType,
 } from "../../../backend/src/types";
-import { v4 } from "uuid";
 
 export const socketAtom = atom<null | WebSocket>({
     key: "socketAtom",
@@ -38,8 +37,12 @@ export const userMapSelector = selector<Record<string, UserType>>({
     },
 });
 
+export const selectedRoomAtom = atom<string>({
+    key: "selectedRoomAtom",
+    default: "",
+});
 export const roomListAtom = atom<RoomType[]>({
-    key: "roolListAtom",
+    key: "roomListAtom",
     default: [],
 });
 

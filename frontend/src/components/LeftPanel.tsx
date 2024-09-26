@@ -1,7 +1,13 @@
-import { useRecoilState, useRecoilValue } from "recoil";
-import { roomListAtom, socketAtom, userAtom } from "../atoms/atoms";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import {
+    roomListAtom,
+    selectedRoomAtom,
+    socketAtom,
+    userAtom,
+} from "../atoms/atoms";
 import { useNavigate } from "react-router-dom";
 import { ClientMessageType, RoomType } from "../../../backend/src/types";
+import { MouseEventHandler } from "react";
 
 export const LeftPanel = () => {
     return (
@@ -82,6 +88,13 @@ const UserDetails = ({
 const RoomList = () => {
     const user = useRecoilValue(userAtom);
     const roomList = useRecoilValue(roomListAtom);
+    const setSelectedRoom = useSetRecoilState(selectedRoomAtom);
+    const handleOnRoomSelect = (room_id: string) => {
+        setSelectedRoom((selectedRoomId) => {
+            return room_id == selectedRoomId ? "" : room_id;
+        });
+    };
+
     return (
         <div className="w-full h-full border border-black">
             {roomList
@@ -89,14 +102,34 @@ const RoomList = () => {
                     room.member_ids.includes(user.user_id)
                 )
                 .map((room: RoomType) => (
-                    <RoomListItem room={room} key={room.room_id} />
+                    <RoomListItem
+                        room={room}
+                        key={room.room_id}
+                        onClick={() => {
+                            handleOnRoomSelect(room.room_id);
+                        }}
+                    />
                 ))}
         </div>
     );
 };
-const RoomListItem = ({ room }: { room: RoomType }) => {
+const RoomListItem = ({
+    room,
+    onClick,
+}: {
+    room: RoomType;
+    onClick: MouseEventHandler<HTMLDivElement>;
+}) => {
+    const selectedRoomId = useRecoilValue(selectedRoomAtom);
     return (
-        <div className="flex flex-col px-4 py-2 border-b border-black hover:bg-gray-200 hover:cursor-pointer">
+        <div
+            className={`flex flex-col px-4 py-2 border-b border-black  hover:cursor-pointer ${
+                selectedRoomId == room.room_id
+                    ? "bg-gray-200"
+                    : "hover:bg-gray-200"
+            } `}
+            onClick={onClick}
+        >
             <div className="text-lg font-mono font-semibold">
                 {room.room_id}
             </div>
