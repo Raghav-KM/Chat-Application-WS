@@ -66,12 +66,24 @@ wss.on("connection", (ws: WebSocket) => {
             const parsed_message = JSON.parse(message) as ClientMessageType;
             handle_message(uuid, parsed_message);
         } catch (ex) {
-            console.log("Invalid Message Type");
+            if (connections[uuid].user_id) {
+                console.log(
+                    `Unable to Parse Client (${connections[uuid].user_id}) Message`
+                );
+            } else {
+                console.log(`Unable to Parse Client (${uuid}) Message`);
+            }
         }
     });
 
     ws.on("close", () => {
-        console.log(`Connection Closed : ${uuid}`);
+        if (connections[uuid].user_id) {
+            console.log(
+                `Connection Closed (${connections[uuid].user_id}) : ${uuid}`
+            );
+        } else {
+            console.log(`Connection Closed : ${uuid}`);
+        }
         delete_connection(uuid);
     });
 });
@@ -81,6 +93,8 @@ const init_connection = (uuid: string, ws: WebSocket) => {
         user_id: "",
         ws: ws,
     };
+
+    console.log(`Connection Established : (${uuid})`);
 
     const user_details_message: ServerMessageType = {
         type: "state",
@@ -113,6 +127,18 @@ const handle_message = (uuid: string, message: ClientMessageType) => {
     if (message.type == "init" && message.init_body) {
         connections[uuid].user_id = message.init_body.user_id;
         user_details[connections[uuid].user_id] = message.init_body;
+
+        const visibility =
+            user_details[connections[uuid].user_id].state.visibility;
+
+        if (visibility == "offline") {
+            console.log(`User (${connections[uuid].user_id}) Logged Out!`);
+        } else if (visibility == "online") {
+            console.log(`User (${connections[uuid].user_id}) Logged In!`);
+        }
+
+        connections[uuid].user_id = "";
+
         broadcast_user_details();
     } else if (message.type == "message" && message.message_body) {
         broadcast_message(message);
