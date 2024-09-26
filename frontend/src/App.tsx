@@ -15,13 +15,13 @@ import { ProtectedRoutes } from "./components/route-types/ProtextedRoutes";
 import { ChatMessageType, ServerMessageType } from "../../backend/src/types";
 
 function App() {
-    const [socket, setSocket] = useRecoilState(socketAtom);
+    const setSocket = useSetRecoilState(socketAtom);
     const setUserList = useSetRecoilState(userListAtom);
     const setRoomList = useSetRecoilState(roomListAtom);
     const setMessages = useSetRecoilState(messageListAtom);
 
     useEffect(() => {
-        const socket = new WebSocket("ws://localhost:3000");
+        const socket = new WebSocket("ws://13.233.75.200:3000");
         socket.onopen = () => {
             console.log("WebSocket Connetion Successfull");
             setSocket(socket);
