@@ -1,5 +1,7 @@
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
+    defaultMessageList,
+    messageListAtom,
     roomListAtom,
     selectedRoomAtom,
     socketAtom,
@@ -29,6 +31,9 @@ const UserInfo = () => {
     const [user, setUser] = useRecoilState(userAtom);
     const socket = useRecoilValue(socketAtom);
     const navigate = useNavigate();
+
+    const setSelectedRoom = useSetRecoilState(selectedRoomAtom);
+    const setMessages = useSetRecoilState(messageListAtom);
     const handleOnLogout = () => {
         const message: ClientMessageType = {
             type: "init",
@@ -48,8 +53,11 @@ const UserInfo = () => {
                 visibility: "offline",
             },
         });
+        setSelectedRoom("");
+        setMessages(defaultMessageList);
 
         sessionStorage.removeItem("active-user");
+
         navigate("/login");
     };
     return (

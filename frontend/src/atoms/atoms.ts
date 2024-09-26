@@ -41,21 +41,24 @@ export const selectedRoomAtom = atom<string>({
     key: "selectedRoomAtom",
     default: "",
 });
+
 export const roomListAtom = atom<RoomType[]>({
     key: "roomListAtom",
     default: [],
 });
 
+export const defaultMessageList = {
+    admin_room_1: {
+        messages: [],
+    },
+    admin_room_2: {
+        messages: [],
+    },
+};
+
 export const messageListAtom = atom<{
     [key: string]: { messages: ChatMessageType[] };
 }>({
     key: "messageListAtom",
-    default: {
-        admin_room_1: {
-            messages: [],
-        },
-        admin_room_2: {
-            messages: [],
-        },
-    },
+    default: defaultMessageList,
 });
