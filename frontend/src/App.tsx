@@ -14,6 +14,8 @@ import { GuestRoutes } from "./components/route-types/GuestRoutes";
 import { ProtectedRoutes } from "./components/route-types/ProtextedRoutes";
 import { ChatMessageType, ServerMessageType } from "../../backend/src/types";
 
+export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL as String;
+
 function App() {
     const setSocket = useSetRecoilState(socketAtom);
     const setUserList = useSetRecoilState(userListAtom);
@@ -21,7 +23,7 @@ function App() {
     const setMessages = useSetRecoilState(messageListAtom);
 
     useEffect(() => {
-        const socket = new WebSocket("ws://13.233.75.200:3000");
+        const socket = new WebSocket(`${BACKEND_URL}`);
         socket.onopen = () => {
             console.log("WebSocket Connetion Successfull");
             setSocket(socket);
