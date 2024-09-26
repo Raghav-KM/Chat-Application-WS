@@ -54,5 +54,8 @@ export const messageListAtom = atom<{
         admin_room_1: {
             messages: [],
         },
+        admin_room_2: {
+            messages: [],
+        },
     },
 });

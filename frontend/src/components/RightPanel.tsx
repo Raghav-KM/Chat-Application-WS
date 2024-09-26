@@ -1,5 +1,10 @@
 import { useRecoilValue } from "recoil";
-import { userAtom, userListAtom } from "../atoms/atoms";
+import {
+    roomListAtom,
+    selectedRoomAtom,
+    userAtom,
+    userListAtom,
+} from "../atoms/atoms";
 import { UserType } from "../../../backend/src/types";
 import { MessageSection } from "./ChatSection";
 
@@ -19,8 +24,15 @@ export const RightPanel = () => {
 const MemberStatus = () => {
     const current_user = useRecoilValue(userAtom);
     const userList = useRecoilValue(userListAtom);
+    const selecterRoomId = useRecoilValue(selectedRoomAtom);
 
-    return (
+    const roomDetails = useRecoilValue(roomListAtom).find(
+        (room) => room.room_id == selecterRoomId
+    );
+
+    return selecterRoomId == "" && !roomDetails ? (
+        <div className="w-full h-full border border-black "></div>
+    ) : (
         <div className="w-full h-full border border-black flex flex-row gap-2">
             <div className="w-24 border-e border-black h-full flex justify-center items-center font-mono">
                 Other
@@ -29,7 +41,11 @@ const MemberStatus = () => {
             </div>
             <div className="flex-grow h-full flex flex-row">
                 {userList
-                    .filter((user) => user.user_id != current_user.user_id)
+                    .filter(
+                        (user) =>
+                            user.user_id != current_user.user_id &&
+                            roomDetails?.member_ids.includes(user.user_id)
+                    )
                     .map((user: UserType) => (
                         <MemberAvatar user={user} key={user.user_id} />
                     ))}
@@ -59,5 +75,3 @@ const MemberAvatar = ({ user }: { user: UserType }) => {
         </div>
     );
 };
-
-

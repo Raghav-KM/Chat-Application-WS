@@ -23,6 +23,10 @@ const room_details: {
         room_id: "admin_room_1",
         member_ids: ["admin_user_1", "admin_user_2", "admin_user_3"],
     },
+    admin_room_2: {
+        room_id: "admin_room_2",
+        member_ids: ["admin_user_1", "admin_user_3"],
+    },
 };
 
 const user_details: {

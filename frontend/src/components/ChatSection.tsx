@@ -2,6 +2,7 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { ChatMessageType, ClientMessageType } from "../../../backend/src/types";
 import {
     messageListAtom,
+    selectedRoomAtom,
     socketAtom,
     userAtom,
     userMapSelector,
@@ -26,6 +27,7 @@ const MessageInput = () => {
     const socket = useRecoilValue(socketAtom);
     const [input, setInput] = useState("");
 
+    const selectedRoomId = useRecoilValue(selectedRoomAtom);
     const user = useRecoilValue(userAtom);
     const setMessage = useSetRecoilState(messageListAtom);
 
@@ -36,20 +38,23 @@ const MessageInput = () => {
             message_id: uuidv4(),
             body: input,
             sender_id: user.user_id,
-            room_id: "admin_room_1",
+            room_id: selectedRoomId,
         };
 
         setMessage((message) => {
-            let updated_message = message;
+            let updated_message = { ...message };
+            console.log(updated_message);
 
             updated_message = {
-                admin_room_1: {
+                ...updated_message,
+                [selectedRoomId]: {
                     messages: [
-                        ...message["admin_room_1"].messages,
+                        ...updated_message[selectedRoomId].messages,
                         new_message,
                     ],
                 },
             };
+
             // console.log(updated_message);
             return updated_message;
         });
@@ -63,7 +68,9 @@ const MessageInput = () => {
         setInput("");
     };
 
-    return (
+    return selectedRoomId == "" ? (
+        <div className="w-full h-full border border-black"></div>
+    ) : (
         <div className="w-full h-full border border-black flex flex-row">
             <div className="flex-grow h-full p-2">
                 <input
@@ -87,7 +94,11 @@ const MessageInput = () => {
 const MessageWindow = () => {
     const user = useRecoilValue(userAtom);
     const messageList = useRecoilValue(messageListAtom);
-    const messages: ChatMessageType[] = messageList["admin_room_1"].messages;
+    const selectedRoomId = useRecoilValue(selectedRoomAtom);
+    
+    const messages: ChatMessageType[] = messageList[selectedRoomId]
+        ? messageList[selectedRoomId].messages
+        : [];
 
     return (
         <div className="w-full min-h-[550px] max-h-[550px] overflow-auto border border-black flex flex-col gap-3 py-2 px-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">

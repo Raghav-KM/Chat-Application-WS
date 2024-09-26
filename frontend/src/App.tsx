@@ -54,9 +54,11 @@ function App() {
                         let updated_message = message;
 
                         updated_message = {
-                            admin_room_1: {
+                            ...updated_message,
+                            [received_message.room_id]: {
                                 messages: [
-                                    ...message["admin_room_1"].messages,
+                                    ...message[received_message.room_id]
+                                        .messages,
                                     received_message,
                                 ],
                             },
